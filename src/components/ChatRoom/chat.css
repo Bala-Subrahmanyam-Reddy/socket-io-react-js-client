@@ -1,0 +1,5 @@
+.chat-container {
+    height: 200px;
+    background-color: lightgray;
+    overflow-y: scroll;
+}
