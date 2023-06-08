@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { TalkBox } from 'react-talk';
 import { Modal, Button } from 'react-bootstrap';
+import { Radio } from 'react-loader-spinner';
 
 export default function ChatRoom({ socket }) {
   const params = useParams();
@@ -12,6 +13,8 @@ export default function ChatRoom({ socket }) {
   const [chatMessages, setChatMessages] = useState([]);
   const [userName, setUserName] = useState('');
   const [userNameModal, setUserNameModal] = useState(true);
+  const [loading, setLoading] = useState(true);
+
   socket.on('connect', () => {
     pushMessage({
       message: 'Connection Established',
@@ -19,6 +22,7 @@ export default function ChatRoom({ socket }) {
       id: socket.id,
     });
     socket.emit('join-room', roomId);
+    setLoading(false);
   });
 
   socket.emit('new-user', userName === '' ? 'Random User' : userName);
@@ -56,13 +60,27 @@ export default function ChatRoom({ socket }) {
     <div className='container mt-5 '>
       <div className='row'>
         <div className='col-12 col-md-4 m-auto'>
-          <TalkBox
-            topic='Chat'
-            currentUserId={socket.id}
-            currentUser='Pinger'
-            messages={chatMessages}
-            onSendMessage={sendMessage}
-          />
+          {loading ? (
+            <div>
+              <Radio
+                visible={true}
+                height='80'
+                width='80'
+                ariaLabel='radio-loading'
+                wrapperStyle={{}}
+                wrapperClass='radio-wrapper'
+              />
+              <p>Connecting to server..</p>
+            </div>
+          ) : (
+            <TalkBox
+              topic='Chat'
+              currentUserId={socket.id}
+              currentUser='Pinger'
+              messages={chatMessages}
+              onSendMessage={sendMessage}
+            />
+          )}
         </div>
       </div>
       <div className='static-modal'>
